@@ -1,8 +1,14 @@
-# LocalFix — Authentication and Role-Based Access Control
+# LocalFix
 
-Backend-only FastAPI service implementing Feature 001 (`specs/001-auth-rbac/`): registration, login,
-logout, self-profile viewing, password reset, and Admin-governed role/account-status management for
-three roles (Citizen, Officer, Admin).
+A FastAPI backend (Feature 001, `specs/001-auth-rbac/`) plus a React/TypeScript/Vite frontend
+(Feature 002, `specs/002-web-frontend-auth/`) implementing registration, login (bearer-token and
+cookie-based), logout, self-profile viewing, password reset via real email, and Admin-governed
+role/account-status management and audit log, for three roles (Citizen, Officer, Admin).
+
+Built end-to-end with GitHub's [Spec Kit](https://github.com/github/spec-kit) (Spec-Driven
+Development) workflow. See [DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md) for a narrative account of how
+this project was built, and [docs/conversation-transcript.md](docs/conversation-transcript.md) for
+the raw development session transcript.
 
 ## Setup
 
