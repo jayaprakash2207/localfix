@@ -1,0 +1,27 @@
+# Secrets / local environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local PostgreSQL data directory (dev convenience, never shared)
+.pgdata/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
