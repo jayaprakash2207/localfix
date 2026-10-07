@@ -8,15 +8,17 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session as DBSession
 
-from src.api.dependencies import require_admin
+from src.api.dependencies import require_admin, require_csrf
 from src.api.schemas import (
     AuditLogResponse,
     RoleChangeRequest,
     RoleChangeResponse,
     StatusChangeRequest,
     StatusChangeResponse,
+    UserListResponse,
 )
-from src.application import account_status_service, role_service
+from src.application import account_status_service, role_service, user_query_service
+from src.domain.models import AccountStatus, Role
 from src.infrastructure.db.models import AuditRecord, UserAccount
 from src.infrastructure.db.session import get_db
 
@@ -28,6 +30,7 @@ def change_role(
     user_id: uuid.UUID,
     body: RoleChangeRequest,
     actor: UserAccount = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
     db: DBSession = Depends(get_db),
 ) -> UserAccount:
     try:
@@ -42,6 +45,22 @@ def change_role(
         ) from exc
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user_not_found") from exc
+
+
+@router.get("/users", response_model=UserListResponse)
+def list_users(
+    search: str | None = Query(default=None),
+    role: Role | None = Query(default=None),
+    status: AccountStatus | None = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    actor: UserAccount = Depends(require_admin),
+    db: DBSession = Depends(get_db),
+) -> UserListResponse:
+    items, total = user_query_service.list_users(
+        db, search=search, role=role, status=status, page=page, page_size=page_size
+    )
+    return UserListResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 @router.get("/audit-log", response_model=AuditLogResponse)
@@ -78,6 +97,7 @@ def change_status(
     user_id: uuid.UUID,
     body: StatusChangeRequest,
     actor: UserAccount = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
     db: DBSession = Depends(get_db),
 ) -> UserAccount:
     try:

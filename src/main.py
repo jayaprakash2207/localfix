@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from src.api import admin, auth, citizen, officer, users
 from src.infrastructure.config import settings
+from src.infrastructure.security.trusted_proxy import TrustedProxyMiddleware
 
 # Security review F6: interactive API docs/schema reveal the full endpoint surface (including
 # admin-only routes) to anyone, unauthenticated. Disable them outside development.
@@ -19,6 +20,10 @@ app = FastAPI(
     redoc_url="/redoc" if _docs_enabled else None,
     openapi_url="/openapi.json" if _docs_enabled else None,
 )
+
+# Feature 002 BE-014/BE-015: must run before routing/rate-limiting so request.client.host is
+# already corrected (for a trusted peer only) by the time any dependency reads it.
+app.add_middleware(TrustedProxyMiddleware)
 
 app.include_router(auth.router)
 app.include_router(users.router)

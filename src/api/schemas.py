@@ -87,3 +87,27 @@ class AuditRecordPublic(BaseModel):
 
 class AuditLogResponse(BaseModel):
     items: list[AuditRecordPublic]
+
+
+class WebSessionResponse(BaseModel):
+    """Feature 002 BE-001/SEC-001: deliberately has no token field - the raw session
+    credential is never present in a response body for the cookie-based web login path."""
+
+    expires_at: datetime
+
+
+class UserListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: EmailStr
+    role: Role
+    status: AccountStatus
+    created_at: datetime
+
+
+class UserListResponse(BaseModel):
+    items: list[UserListItem]
+    total: int
+    page: int
+    page_size: int
